@@ -10,13 +10,13 @@ const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { signIn } = useContext(AuthContext);
+  const { signIn, loadingAuth } = useContext(AuthContext);
 
-  const handleSignIn = (e) => {
+  const handleSignIn = async (e) => {
     e.preventDefault();
 
     if (email !== "" && password !== "") {
-      signIn(email, password);
+      await signIn(email, password);
     }
   };
 
@@ -40,7 +40,9 @@ const SignIn = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <button type="submit">Acessar</button>
+          <button type="submit">
+            {loadingAuth ? "Carregando..." : "Acessar"}
+          </button>
         </form>
         <Link to="/register">Criar uma conta</Link>
       </div>
