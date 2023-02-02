@@ -32,6 +32,7 @@ const SignUp = () => {
             placeholder="Seu nome"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            autoFocus={true}
           />
           <input
             type="text"

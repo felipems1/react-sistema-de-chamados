@@ -33,6 +33,7 @@ const SignIn = () => {
             placeholder="email@gmail.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            autoFocus={true}
           />
           <input
             type="password"
