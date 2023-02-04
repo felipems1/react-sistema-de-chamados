@@ -4,6 +4,7 @@ import SignIn from "../pages/SignIn";
 import SingUp from "../pages/SignUp";
 import Dashboard from "../pages/Dashboard";
 import Profile from "../pages/Profile";
+import Customers from "../pages/Customers";
 
 import Private from "./Private";
 
@@ -25,6 +26,14 @@ const RoutesApp = () => {
         element={
           <Private>
             <Profile />
+          </Private>
+        }
+      />
+      <Route
+        path="/customers"
+        element={
+          <Private>
+            <Customers />
           </Private>
         }
       />
