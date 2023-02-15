@@ -1,18 +1,66 @@
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import "./New.css";
 import Header from "../../components/Header";
 import Title from "../../components/Title";
 import { FiPlusCircle } from "react-icons/fi";
 
+import { AuthContext } from "../../contexts/auth";
+import { db } from "../../services/firebaseConnection";
+import { collection, getDocs, getDoc, doc } from "firebase/firestore";
+
+const listRef = collection(db, "customers");
+
 const New = () => {
+  const { user } = useContext(AuthContext);
+
   const [customers, setCustomers] = useState([]);
+  const [loadCustomer, setLoadCustomer] = useState(true);
+  const [customerSelected, setCustomerSelected] = useState(0);
 
   const [complemento, setComplemento] = useState("");
   const [assunto, setAssunto] = useState("Suporte");
   const [status, setStatus] = useState("Aberto");
 
+  useEffect(() => {
+    const loadCustomers = async () => {
+      const querySnapShot = await getDocs(listRef)
+        .then((snapshot) => {
+          let lista = [];
+
+          snapshot.forEach((doc) => {
+            lista.push({
+              id: doc.id,
+              nomeFantasia: doc.data().nomeFantasia,
+            });
+          });
+          if (snapshot.docs.size === 0) {
+            setCustomers([{ id: "1", nomeFantasia: "FREELA" }]);
+            setLoadCustomer(false);
+            return;
+          }
+          setCustomers(lista);
+          setLoadCustomer(false);
+        })
+        .catch((error) => {
+          console.log(error);
+          setLoadCustomer(false);
+          setCustomers([{ id: "1", nomeFantasia: "FREELA" }]);
+        });
+    };
+
+    loadCustomers();
+  }, []);
+
   const handleOptionChange = (e) => {
     setStatus(e.target.value);
+  };
+
+  const handleChangeSelect = (e) => {
+    setAssunto(e.target.value);
+  };
+
+  const handleChangeCustomer = (e) => {
+    setCustomerSelected(e.target.value);
   };
 
   return (
@@ -25,16 +73,19 @@ const New = () => {
         <div className="container">
           <form className="form-profile">
             <label>Clientes</label>
-            <select>
-              <option key={1} value={1}>
-                Mercado Teste
-              </option>
-              <option key={2} value={2}>
-                Loja informatica
-              </option>
-            </select>
+            {loadCustomer ? (
+              <input type="text" disabled={true} value="Carregando..." />
+            ) : (
+              <select value={customerSelected} onChange={handleChangeCustomer}>
+                {customers.map((item, index) => (
+                  <option key={index} value={index}>
+                    {item.nomeFantasia}
+                  </option>
+                ))}
+              </select>
+            )}
             <label>Assunto</label>
-            <select>
+            <select value={assunto} onChange={handleChangeSelect}>
               <option value="Suporte">Suporte</option>
               <option value="Visita Tecnica">Visita Tecnica</option>
               <option value="Financeiro">Financeiro</option>
