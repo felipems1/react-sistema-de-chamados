@@ -24,15 +24,19 @@ const listRef = collection(db, "chamados");
 const Dashboard = () => {
   const [chamados, setChamados] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const [isEmpty, setIsEmpty] = useState(false);
+  const [lastDocs, setLastDocs] = useState();
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const { logout } = useContext(AuthContext);
 
   useEffect(() => {
     const loadChamados = async () => {
-      const q = query(listRef, orderBy("created", "desc"), limit(5));
+      const q = query(listRef, orderBy("created", "desc"), limit(2));
 
       const querySnapshot = await getDocs(q);
+      setChamados([]);
       await updateState(querySnapshot);
 
       setLoading(false);
@@ -61,10 +65,27 @@ const Dashboard = () => {
           complemento: doc.data().complemento,
         });
       });
+      const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+
       setChamados((chamados) => [...chamados, ...lista]);
+      setLastDocs(lastDoc);
     } else {
       setIsEmpty(true);
     }
+
+    setLoadingMore(false);
+  };
+
+  const handleMore = async () => {
+    setLoadingMore(true);
+    const q = query(
+      listRef,
+      orderBy("created", "desc"),
+      startAfter(lastDocs),
+      limit(2)
+    );
+    const querySnapshot = await getDocs(q);
+    await updateState(querySnapshot);
   };
 
   if (loading) {
@@ -120,7 +141,10 @@ const Dashboard = () => {
                       <td data-label="Status">
                         <span
                           className="badge"
-                          style={{ backgroundColor: "#999" }}
+                          style={{
+                            backgroundColor:
+                              item.status === "Aberto" ? "#5cb85c" : "#999",
+                          }}
                         >
                           {item.status}
                         </span>
@@ -144,6 +168,14 @@ const Dashboard = () => {
                   ))}
                 </tbody>
               </table>
+              {loadingMore && (
+                <h3 className="more">Buscando mais chamados...</h3>
+              )}
+              {!loadingMore && !isEmpty && (
+                <button className="btn-more" onClick={handleMore}>
+                  Buscar mais
+                </button>
+              )}
             </>
           )}
         </>
