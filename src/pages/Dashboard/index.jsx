@@ -151,18 +151,19 @@ const Dashboard = () => {
                       </td>
                       <td data-label="Cadastrado">{item.createdFormat}</td>
                       <td data-label="#">
-                        <button
+                        <Link
                           className="action"
                           style={{ backgroundColor: "#3583f6" }}
                         >
                           <FiSearch color="#fff" size={17} />
-                        </button>
-                        <button
+                        </Link>
+                        <Link
+                          to={`/new/${item.id}`}
                           className="action"
                           style={{ backgroundColor: "#f6a935" }}
                         >
                           <FiEdit2 color="#fff" size={17} />
-                        </button>
+                        </Link>
                       </td>
                     </tr>
                   ))}

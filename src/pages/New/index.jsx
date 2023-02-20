@@ -8,12 +8,15 @@ import { AuthContext } from "../../contexts/auth";
 import { db } from "../../services/firebaseConnection";
 import { collection, getDocs, getDoc, doc, addDoc } from "firebase/firestore";
 
+import { useParams } from "react-router-dom";
+
 import { toast } from "react-toastify";
 
 const listRef = collection(db, "customers");
 
 const New = () => {
   const { user } = useContext(AuthContext);
+  const { id } = useParams();
 
   const [customers, setCustomers] = useState([]);
   const [loadCustomer, setLoadCustomer] = useState(true);
@@ -22,6 +25,7 @@ const New = () => {
   const [complemento, setComplemento] = useState("");
   const [assunto, setAssunto] = useState("Suporte");
   const [status, setStatus] = useState("Aberto");
+  const [idCustomer, setIdCustomer] = useState(false);
 
   useEffect(() => {
     const loadCustomers = async () => {
@@ -42,6 +46,10 @@ const New = () => {
           }
           setCustomers(lista);
           setLoadCustomer(false);
+
+          if (id) {
+            loadId(lista);
+          }
         })
         .catch((error) => {
           console.log(error);
@@ -51,7 +59,27 @@ const New = () => {
     };
 
     loadCustomers();
-  }, []);
+  }, [id]);
+
+  const loadId = async (lista) => {
+    const docRef = doc(db, "chamados", id);
+    await getDoc(docRef)
+      .then((snapshot) => {
+        setAssunto(snapshot.data().assunto);
+        setStatus(snapshot.data().status);
+        setComplemento(snapshot.data().complemento);
+
+        let index = lista.findIndex(
+          (item) => item.id === snapshot.data().clienteId
+        );
+        setCustomerSelected(index);
+        setIdCustomer(true);
+      })
+      .catch((error) => {
+        console.log(error);
+        setIdCustomer(false);
+      });
+  };
 
   const handleOptionChange = (e) => {
     setStatus(e.target.value);
@@ -67,6 +95,9 @@ const New = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+
+    if (idCustomer) {
+    }
 
     await addDoc(collection(db, "chamados"), {
       created: new Date(),
