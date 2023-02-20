@@ -6,9 +6,16 @@ import { FiPlusCircle } from "react-icons/fi";
 
 import { AuthContext } from "../../contexts/auth";
 import { db } from "../../services/firebaseConnection";
-import { collection, getDocs, getDoc, doc, addDoc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  getDoc,
+  doc,
+  addDoc,
+  updateDoc,
+} from "firebase/firestore";
 
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import { toast } from "react-toastify";
 
@@ -17,6 +24,7 @@ const listRef = collection(db, "customers");
 const New = () => {
   const { user } = useContext(AuthContext);
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [customers, setCustomers] = useState([]);
   const [loadCustomer, setLoadCustomer] = useState(true);
@@ -97,6 +105,27 @@ const New = () => {
     e.preventDefault();
 
     if (idCustomer) {
+      const docRef = doc(db, "chamados", id);
+      await updateDoc(docRef, {
+        cliente: customers[customerSelected].nomeFantasia,
+        clienteId: customers[customerSelected].id,
+        assunto: assunto,
+        complemento: complemento,
+        status: status,
+        userId: user.uid,
+      })
+        .then(() => {
+          toast.success("Chamado atualizado com sucesso!");
+          setCustomerSelected(0);
+          setComplemento("");
+          navigate("/dashboard");
+        })
+        .catch((error) => {
+          toast.error("Ops erro ao atualizar esse chamado!");
+          console.log(error);
+        });
+
+      return;
     }
 
     await addDoc(collection(db, "chamados"), {
@@ -109,7 +138,7 @@ const New = () => {
       userId: user.uid,
     })
       .then(() => {
-        toast.success("Chamado registrado!");
+        toast.info("Chamado registrado!");
         setComplemento("");
         setCustomerSelected(0);
       })
@@ -123,7 +152,7 @@ const New = () => {
     <div>
       <Header />
       <div className="content">
-        <Title name="Novo chamado">
+        <Title name={id ? "Editando Chamado" : "Novo Chamado"}>
           <FiPlusCircle size={25} />
         </Title>
         <div className="container">
