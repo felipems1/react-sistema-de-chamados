@@ -30,6 +30,9 @@ const Dashboard = () => {
   const [lastDocs, setLastDocs] = useState();
   const [loadingMore, setLoadingMore] = useState(false);
 
+  const [showPostModal, setShowPostModal] = useState(false);
+  const [details, setDetails] = useState();
+
   const { logout } = useContext(AuthContext);
 
   useEffect(() => {
@@ -87,6 +90,11 @@ const Dashboard = () => {
     );
     const querySnapshot = await getDocs(q);
     await updateState(querySnapshot);
+  };
+
+  const toggleModal = (item) => {
+    setShowPostModal(!showPostModal);
+    setDetails(item);
   };
 
   if (loading) {
@@ -152,12 +160,13 @@ const Dashboard = () => {
                       </td>
                       <td data-label="Cadastrado">{item.createdFormat}</td>
                       <td data-label="#">
-                        <Link
+                        <button
                           className="action"
                           style={{ backgroundColor: "#3583f6" }}
+                          onClick={() => toggleModal(item)}
                         >
                           <FiSearch color="#fff" size={17} />
-                        </Link>
+                        </button>
                         <Link
                           to={`/new/${item.id}`}
                           className="action"
@@ -182,7 +191,12 @@ const Dashboard = () => {
           )}
         </>
       </div>
-      <Modal />
+      {showPostModal && (
+        <Modal
+          conteudo={details}
+          close={() => setShowPostModal(!showPostModal)}
+        />
+      )}
     </div>
   );
 };
