@@ -119,7 +119,6 @@ const Profile = () => {
               type="text"
               value={nome}
               onChange={(e) => setNome(e.target.value)}
-              autoFocus={true}
             />
             <label>Email</label>
             <input type="text" value={email} disabled={true} />

@@ -37,7 +37,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     const loadChamados = async () => {
-      const q = query(listRef, orderBy("created", "desc"), limit(2));
+      const q = query(listRef, orderBy("created", "desc"), limit(1));
 
       const querySnapshot = await getDocs(q);
       setChamados([]);
