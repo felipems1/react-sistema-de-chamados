@@ -19,6 +19,7 @@ Esse projeto foi desenvolvido com as seguintes tecnologias:
 - ReactJS
 - JavaScript
 - CSS
+- Context API
 - React-Router
 - Firebase
 - Git e Github
